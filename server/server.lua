@@ -126,7 +126,7 @@ local registerShop = function(shopID, shopCfg)
 
     if Config.Shops[shopID] then
         if (Config.Shops[shopID].label ~= basicShop.label) then
-            print("frudy-shops::registerShop - Shop already registered with ID: "..shopID)
+            print("frudy_shops::registerShop - Shop already registered with ID: "..shopID)
         end
 
         return
@@ -139,7 +139,7 @@ end
 exports("RegisterShop", registerShop)
 
 ---@param shopID number
-lib.callback.register("frudy-shops:server:GetShop", function(source, shopID)
+lib.callback.register("frudy_shops:server:GetShop", function(source, shopID)
     if (not shopID) then return end
 
     return Config.Shops[shopID]
@@ -152,7 +152,7 @@ end)
 ---@field PurchasePayload.price number
 ---@field PurchasePayload.amount number
 ---@field PurchasePayload.method string
-lib.callback.register("frudy-shops:server:ProcessTransaction", function(source, payload)
+lib.callback.register("frudy_shops:server:ProcessTransaction", function(source, payload)
     local src = source
     local completed, errMsg = validPayload(payload)
 

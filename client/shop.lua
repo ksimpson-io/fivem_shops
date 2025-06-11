@@ -78,7 +78,7 @@ TransactionMenu = function(productID, product, invItem)
 end
 
 ProcessTransaction = function()
-    local purchased, msg = lib.callback.await("frudy-shops:server:ProcessTransaction", false, Payload)
+    local purchased, msg = lib.callback.await("frudy_shops:server:ProcessTransaction", false, Payload)
     local err = (purchased and "success") or "error"
 
     QBCore.Functions.Notify(Config.Locales[msg], err)
@@ -90,6 +90,6 @@ ProcessTransaction = function()
 end
 
 
--- RegisterNetEvent("frudy-shops:client:openExternalShop", function(shopID)
+-- RegisterNetEvent("frudy_shops:client:openExternalShop", function(shopID)
 --     ShopMenu({shopID = shopID, locationID = 1})
 -- end)

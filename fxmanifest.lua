@@ -3,7 +3,7 @@ use_experimental_fxv2_oal "yes"
 lua54 "yes"
 game "gta5"
 
-name "frudy-shops"
+name "frudy_shops"
 author "4rudy"
 version "1.5.0"
 description "A modular shops system for FiveM"

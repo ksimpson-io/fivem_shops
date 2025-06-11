@@ -16,7 +16,7 @@ end
 
 ---@param shopID string
 local GetShopCfg = function(shopID)
-    CachedShops[shopID] = CachedShops[shopID] or lib.callback.await("frudy-shops:server:GetShop", false, shopID)
+    CachedShops[shopID] = CachedShops[shopID] or lib.callback.await("frudy_shops:server:GetShop", false, shopID)
 
     return CachedShops[shopID]
 end
@@ -228,12 +228,12 @@ ShopMenu = function(shopData)
     end
 
     lib.registerContext({
-        id = "frudy-shops::ShopMenu",
+        id = "frudy_shops::ShopMenu",
         title = CurrentShop.cfg.label,
         options = menuOptions,
     })
 
-    return lib.showContext("frudy-shops::ShopMenu")
+    return lib.showContext("frudy_shops::ShopMenu")
 end
 exports("OpenShopMenu", ShopMenu)
 
