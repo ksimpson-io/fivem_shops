@@ -1,12 +1,14 @@
-if ((GetResourceState("ox_inventory") ~= "starting") and (GetResourceState("ox_inventory") ~= "started")) then return end
-
 local QBCore = exports["qb-core"]:GetCoreObject()
 local OxInv = exports["ox_inventory"]
+local shopTokens = {}
 
-CreateThread(function()
-    -- Apply ox_lib debug state based on app debug
-    SetConvarReplicated("ox:printlevel:"..GetCurrentResourceName(), Config.Debug and "debug" or "false")
-end)
+local validCustomer = function(source)
+    if (not source) then return nil end
+    local customer = QBCore.Functions.GetPlayer(source)
+    if (not customer) or (not Player(source).state.basicshops) then return nil end
+
+    return customer
+end
 
 ---@param customer table
 ---@param method string
@@ -31,42 +33,68 @@ end
 
 --- @param payload table
 local validPayload = function(payload)
-    -- TODO: Callbacks dont support assertions, so we need to manually check the types
-    -- core.assert.table(payload, "invalid_payload")
-    -- core.assert.number(payload.price, "invalid_amount")
-    -- core.assert.string(payload.method, "invalid_payment_type")
-    -- core.assert.number(payload.productID, "invalid_item")
-    -- core.assert.string(payload.shop, "invalid_shop")
-
-    -- Temporary type checking until callbacks properly support assertions
     if (type(payload) ~= "table") then return false, "invalid_payload" end
     if (type(payload.shopID) ~= "string") then return false, "invalid_shop" end
     if (type(payload.locationID) ~= "number") then return false, "invalid_location" end
-    if (type(payload.productID) ~= "number") then return false, "invalid_item_index" end
-    if (type(payload.amount) ~= "number") then return false, "invalid_amount" end
+    if (type(payload.cart) ~= "table") then return false, "invalid_items" end
     if (type(payload.price) ~= "number") then return false, "invalid_amount" end
     if (type(payload.method) ~= "string") then return false, "invalid_payment_type" end
+    for _, item in pairs(payload.cart) do
+        if (type(item) ~= "table") then return false, "invalid_item_table" end
+        if (type(item.productID) ~= "number") then return false, "invalid_item_index" end
+        if (type(item.count) ~= "number") then return false, "invalid_item_amount" end
+    end
 
     return true
 end
 
 --- @param shopCfg table
 --- @param products table
---- @param product table
-local validShop = function(shopCfg, products, product)
+--- @param cart table
+local validShop = function(shopCfg, products, cart)
     if (not shopCfg) then
         return false, "shop_not_found"
     end
 
-    if (not products) then
+    if (not products) or (not next(products)) then
         return false, "invalid_product_category"
     end
 
-    if (not product) then
-        return false, "item_not_found"
+    for _, item in pairs(cart) do
+        if (not item.count) then
+            return false, "invalid_amount"
+        end
+
+        if (not item.productID) or (not products[item.productID]) then
+            return false, "invalid_item_index"
+        end
+
+        local itemData = OxInv:Items(products[item.productID].name)
+        if (not itemData) then
+            return false, "item_not_found"
+        end
+
+        item.name = itemData.name
     end
 
-    return true
+    return true, nil, cart
+end
+
+--- @param cart table
+--- @param products table
+--- @param price number
+local getTotalPrice = function(cart, products, price)
+    local total = 0
+
+    for _, item in pairs(cart) do
+        total = total + (item.count * products[item.productID].price)
+    end
+
+    if (total ~= price) then -- BAN THEM
+        DropPlayer(source, "mc9-basicshops::getTotalPrice mismatch")
+    end
+
+    return total
 end
 
 ---@param product table
@@ -148,14 +176,15 @@ end)
 ---@class PurchasePayload
 ---@field PurchasePayload.shopID string
 ---@field PurchasePayload.locationID number
----@field PurchasePayload.productID number
+---@field PurchasePayload.cart number
 ---@field PurchasePayload.price number
 ---@field PurchasePayload.amount number
 ---@field PurchasePayload.method string
-lib.callback.register("frudy_shops:server:ProcessTransaction", function(source, payload)
-    local src = source
-    local completed, errMsg = validPayload(payload)
+lib.callback.create("frudy_shops:server:ProcessTransaction", function(source, payload)
+	local customer = validCustomer(source)
+	if (not customer) then return false, "player_not_found" end
 
+    local completed, errMsg = validPayload(payload)
     if (not completed) then
         return false, errMsg
     end
@@ -163,16 +192,15 @@ lib.callback.register("frudy_shops:server:ProcessTransaction", function(source, 
     local shopCfg = Config.Shops[payload.shopID]
     local isSelling = shopCfg.mode and (shopCfg.mode == "sell")
     local products = (shopCfg.custom and shopCfg.products) or Config.Products[shopCfg.productSet]
-    local product = products[payload.productID]
-    local totalCost = product.price * payload.amount
 
-    completed, errMsg = validShop(shopCfg, products, product)
+    completed, errMsg, payload.cart = validShop(shopCfg, products, payload.cart)
     if (not completed) then
         return false, errMsg
     end
 
+    local totalCost = getTotalPrice(payload.cart, products, payload.price)
     if (not shopCfg.custom) then
-        local playerCoords = GetEntityCoords(GetPlayerPed(src))
+        local playerCoords = GetEntityCoords(GetPlayerPed(source))
         local shopCoords = shopCfg.coords[payload.locationID]
         local distance = #(playerCoords - vec3(shopCoords.x, shopCoords.y, shopCoords.z))
 
@@ -181,34 +209,33 @@ lib.callback.register("frudy_shops:server:ProcessTransaction", function(source, 
         end
     end
 
-    local customer = QBCore.Functions.GetPlayer(src)
-    if (not customer) then
-        return false, "player_not_found"
-    end
-
-    local itemData = OxInv:Items(product.name)
-    if (not itemData) then
-        return false, "item_not_found"
-    end
-
     if (not isSelling) then
-        local canCarry = OxInv:CanCarryItem(src, product.name, payload.amount)
-        if (not canCarry) then
-            return false, "cannot_carry_item"
+        for _, product in pairs(payload.cart) do
+            local canCarry = OxInv:CanCarryItem(source, product.name, product.count)
+            if (not canCarry) then
+                return false, "cannot_carry_item"
+            end
         end
 
         if not canPay(customer, payload.method, totalCost) then
             return false, "not_enough_money"
         end
 
-        completed, errMsg = OxInv:AddItem(src, itemData.name, payload.amount)
+        for _, product in pairs(payload.cart) do
+            completed, errMsg = OxInv:AddItem(source, product.name, product.amount)
+        end
+
     else
-        if (OxInv:GetItemCount(src, itemData.name) <= 0) or (OxInv:GetItemCount(src, itemData.name) < payload.amount) then
-            return false, "not_enough_items"
+        for _, product in pairs(payload.cart) do
+            if (OxInv:GetItemCount(source, product.name) <= 0) or (OxInv:GetItemCount(source, product.name) < product.amount) then
+                return false, "not_enough_items"
+            end
         end
 
         finishSell(customer, payload.method, totalCost)
-        completed, errMsg = OxInv:RemoveItem(src, itemData.name, payload.amount)
+        for _, product in pairs(payload.cart) do
+            completed, errMsg = OxInv:RemoveItem(source, product.name, product.amount)
+        end
     end
 
     if (completed) then
@@ -216,20 +243,39 @@ lib.callback.register("frudy_shops:server:ProcessTransaction", function(source, 
         local action = isSelling and "sold" or "bought"
         local direction = isSelling and "to" or "from"
 
-        TriggerEvent("qb-log:server:CreateLog", "shops", "Shop Transaction", color, string.format(
-            "**%s** (CitizenID: %s) %s %dx %s %s %s for $%d",
+        local itemLines = {}
+        for _, item in pairs(payload.cart) do
+            local product = products[item.productID]
+            if product then
+                table.insert(itemLines, string.format("- %dx %s", item.count, product.name))
+            end
+        end
+
+        local logMsg = string.format(
+            "**%s** (CitizenID: %s) %s the following items %s %s for $%d:\n%s",
             customer.PlayerData.name,
             customer.PlayerData.citizenid,
             action,
-            payload.amount,
-            itemData.name,
             direction,
             shopCfg.label,
-            totalCost
-        ))
+            totalCost,
+            table.concat(itemLines, "\n")
+        )
+
+        TriggerEvent("qb-log:server:CreateLog", "shops", "Shop Transaction", color, logMsg)
 
         errMsg = "success"
     end
 
     return completed, errMsg
+end)
+
+lib.callback.create('mc9-basicshops:server:getToken', function(source, job)
+	local customer = validCustomer(source)
+	if (not customer) then DropPlayer(source, "Bitch") return end
+
+    local token = tostring(math.random(100000, 999999))
+    shopTokens[source] = token
+
+	return token
 end)

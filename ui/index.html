@@ -1,0 +1,91 @@
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@next"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+    <script src="https://kit.fontawesome.com/221cb53ebd.js" crossorigin="anonymous"></script>
+</head>
+
+
+
+<body>
+    <div class="back-container" style="display: none;">
+        <div class="main-container" style="display: none;">
+            <div class="left-container">
+                <div class="shop-title"> </div>
+                <div class="header-div">
+                    <div class="search-bar">
+                        <svg id="svg" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13.5215 12.2468L10.9782 9.71106C11.7988 8.66568 12.244 7.37476 12.2424 6.0458C12.2424 4.86226 11.8914 3.7053 11.2339 2.72122C10.5763 1.73714 9.64173 0.970143 8.54828 0.517221C7.45483 0.0642993 6.25163 -0.0542057 5.09083 0.176692C3.93003 0.40759 2.86376 0.977519 2.02687 1.81441C1.18998 2.6513 0.620053 3.71756 0.389155 4.87837C0.158258 6.03917 0.276763 7.24237 0.729685 8.33582C1.18261 9.42927 1.9496 10.3639 2.93368 11.0214C3.91776 11.6789 5.07473 12.0299 6.25827 12.0299C7.58723 12.0316 8.87814 11.5863 9.92353 10.7658L12.4593 13.309C12.5288 13.3791 12.6116 13.4348 12.7027 13.4727C12.7939 13.5107 12.8916 13.5303 12.9904 13.5303C13.0891 13.5303 13.1869 13.5107 13.278 13.4727C13.3692 13.4348 13.4519 13.3791 13.5215 13.309C13.5916 13.2395 13.6472 13.1567 13.6852 13.0656C13.7232 12.9744 13.7427 12.8767 13.7427 12.7779C13.7427 12.6792 13.7232 12.5814 13.6852 12.4902C13.6472 12.3991 13.5916 12.3164 13.5215 12.2468ZM1.7702 6.0458C1.7702 5.15815 2.03342 4.29043 2.52657 3.55237C3.01973 2.81431 3.72067 2.23906 4.54076 1.89937C5.36084 1.55968 6.26325 1.4708 7.13385 1.64397C8.00445 1.81714 8.80414 2.24459 9.43181 2.87226C10.0595 3.49993 10.4869 4.29962 10.6601 5.17022C10.8333 6.04083 10.7444 6.94323 10.4047 7.76331C10.065 8.5834 9.48977 9.28434 8.75171 9.7775C8.01365 10.2707 7.14592 10.5339 6.25827 10.5339C5.06796 10.5339 3.9264 10.061 3.08472 9.21935C2.24305 8.37767 1.7702 7.23611 1.7702 6.0458Z" fill="#8C8C8C"/>
+                        </svg>
+                        <input class="searchBar-input" type="text" placeholder="Search">
+                    </div>
+                        <div class="action-bar">
+                        <button class="action active" data-target="all">
+                            <svg width="23" height="24" viewBox="0 0 23 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.331055" y="0.772339" width="9.68289" height="9.68289" rx="2.31676" fill="#D9D9D9" fill-opacity="0.26"/><rect x="13.2417" y="0.772156" width="9.68289" height="9.68289" rx="2.31676" fill="#D9D9D9" fill-opacity="0.26"/><rect x="13.2417" y="14.2207" width="9.68289" height="9.68289" rx="2.31676" fill="#D9D9D9" fill-opacity="0.26"/><rect x="0.331055" y="14.2207" width="9.68289" height="9.68289" rx="2.31676" fill="#D9D9D9" fill-opacity="0.26"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="item-body">
+                    <div class="itemBox">
+                        <div class="img-box">
+                            <img src="images/weapon_flashlight.png">
+                        </div>
+                        <div class="item-name">Flashlight</div>
+                        <div class="button-container">
+                            <button class="addToCart">
+                                Add To Cart
+                            </button>
+                            <div class="priceofItem">$10</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-container">
+                <div class="header-right">
+                    <h1 class="header-top">CART</h1>
+                </div>
+                <div class="right-body">
+                    <div class="shopcart"></div>
+                    <div class="right-altBody">
+                        <div class="total-div">
+                            <div class="total-text"></div>
+                            <div class="total-price">
+                                $ 0.00
+                            </div>
+                        </div>
+                        <div class="shopping-act-div">
+                            <div class="top-btns">
+                                <div class="left-btn-cont">
+                                    <button class="pay paywithcard">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                        <span class="btn-text">Card</span>
+                                    </button>
+                                </div>
+
+                                <div class="right-btn-cont">
+                                    <button class="pay paywithcash">
+                                        <i class="fa-solid fa-money-bill-wave"></i>
+                                        <span class="btn-text">Cash</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bottom-btns">
+                                <div class="right-btn-cont">
+                                    <button class="pay paywithcompany">
+                                        <i class="fa-solid fa-building-columns"></i>
+                                        <span class="btn-text">Company</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>

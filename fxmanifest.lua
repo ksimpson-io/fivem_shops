@@ -22,10 +22,14 @@ server_scripts {
 client_scripts {
     "@PolyZone/client.lua",
     "@PolyZone/BoxZone.lua",
-    "@PolyZone/EntityZone.lua",
-    "@PolyZone/CircleZone.lua",
-    "@PolyZone/ComboZone.lua",
 
     "client/main.lua",
     "client/shop.lua",
+}
+
+lua54 'yes'
+
+ui_page 'ui/index.html'
+files {
+	'ui/**.*',
 }

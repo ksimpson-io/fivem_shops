@@ -1,5 +1,3 @@
-if ((GetResourceState("ox_inventory") ~= "starting") and (GetResourceState("ox_inventory") ~= "started")) then return end
-
 QBCore = exports["qb-core"]:GetCoreObject()
 OxInv = exports.ox_inventory
 PlayerData = {}
@@ -12,6 +10,15 @@ CachedShops = Config.Shops
 
 KillPayload = function()
     Payload = {}
+    LocalPlayer.state:set("basicshops", false, true)
+end
+
+KillShop = function(id)
+    Interactions[id] = nil
+    CurrentShop = {}
+    CurrentShop = {}
+    KillPayload()
+    DeleteEntity(Peds[id])
 end
 
 ---@param shopID string
@@ -45,10 +52,10 @@ end
 --- @param coords vector3
 --- @param pedCfg table | nil
 CreateShopPed = function(coords, pedCfg)
-    if (not Config.UsePeds) or (not pedCfg) or (pedCfg.disabled) then return end
+    if (not Config.UsePeds) or (not pedCfg) or (pedCfg.disabled) or (not (pedCfg.models)) or (not next(pedCfg.models)) then return end
 
     local shopModel = pedCfg.models[math.random(1, #pedCfg.models)]
-    local id = "mc9_shops_ped_" .. tostring(coords)
+    local id = "frudy_shops_ped_" .. tostring(coords)
     local pedZone = BoxZone:Create(vec3(coords.x, coords.y, coords.z), 15.0, 15.0, {
         name = id,
         offset = {0.0, 0.0, 0.0},
@@ -78,10 +85,7 @@ CreateShopPed = function(coords, pedCfg)
             end
         else
             if (Interactions[id]) then
-                Interactions[id] = nil
-                CurrentShop = {}
-                KillPayload()
-                DeleteEntity(Peds[id])
+                KillShop(id)
             end
         end
     end)
@@ -108,7 +112,7 @@ CreateShopInteraction = function(shopID, locationID, useTarget, coords, shopKey)
                     name = shopKey,
                     icon = "fas fa-certificate",
                     label = "Browse Shop",
-                    onSelect = function() ShopMenu(shopData) end,
+                    onSelect = function() OpenShop(shopData) end,
                 }
             }
         })
@@ -121,7 +125,7 @@ CreateShopInteraction = function(shopID, locationID, useTarget, coords, shopKey)
             options = {
                 {
                     label = "Browse Shop",
-                    action = function() ShopMenu(shopData) end,
+                    action = function() OpenShop(shopData) end,
                 },
             }
         })
@@ -158,7 +162,11 @@ MeetsReqs = function(requirements, isShop, productName)
         if req.licence then
             auth = "licence"
             if (PlayerData.metadata.licences[req.licence]) then
-                return true
+                if (not req.needItem) then return true end
+
+                if (OxInv:GetItemCount(req.needItem) > 0) then
+                    return true
+                end
             end
         elseif (req.item) then
             auth = "item"
@@ -200,7 +208,7 @@ ValidShop = function(shopData)
 end
 
 --- @param shopData table | string
-ShopMenu = function(shopData)
+OpenShop = function(shopData)
     if type(shopData) == "string" then
         shopData = {
             shopID = shopData,
@@ -210,7 +218,7 @@ ShopMenu = function(shopData)
 
     local shopProducts = ValidShop(shopData)
     if (not CurrentShop) or (not shopProducts) then
-        print("shops::ShopMenu - Invalid Shop")
+        print("shops::OpenShop - Invalid Shop")
         return
     end
 
@@ -219,26 +227,28 @@ ShopMenu = function(shopData)
 
     if (not MeetsReqs(shopCfg.requirements, true)) then return end
 
-    local menuOptions = {}
+    local shopItems = {}
     for productID = 1, #shopProducts do
-        local menuOption = ProductOption(productID)
-        if menuOption then
-            table.insert(menuOptions, menuOption)
-        end
+        table.insert(shopItems, GetProduct(productID))
     end
 
-    lib.registerContext({
-        id = "frudy_shops::ShopMenu",
-        title = CurrentShop.cfg.label,
-        options = menuOptions,
-    })
+    LocalPlayer.state:set("basicshops", true, true)
+	SendNUIMessage({
+		action = "market",
+		items = shopItems,
+        shopLabel = shopCfg.label,
+		shopData = shopData,
+		companyOrder = shopCfg.useBossFunds or false,
+		-- orderType = orderType,
+		token = lib.callback.await("mc9-basicshops:server:getToken", false)
+	})
 
-    return lib.showContext("frudy_shops::ShopMenu")
+	SetNuiFocus(true, true)
 end
-exports("OpenShopMenu", ShopMenu)
+exports("OpenShop", OpenShop)
 
 --- @param productID number
-ProductOption = function(productID)
+GetProduct = function(productID)
     local isSelling = CurrentShop.cfg.mode and CurrentShop.cfg.mode == "sell"
     local product = (CurrentShop.cfg.custom and CurrentShop.cfg.products[productID]) or Config.Products[CurrentShop.cfg.productSet][productID]
     local invItem = OxInv:Items(product.name)
@@ -252,22 +262,24 @@ ProductOption = function(productID)
         return nil
     end
 
-    local priceLabel = isSelling and "Sell Price: " or "Cost: "
-    local priceText = (product.price == 0 and "Free") or (priceLabel .. CurrentShop.currencyIcon .. " " .. product.price)
-    local weightText = (invItem.weight == 0 and "") or ("\nWeight: " .. (invItem.weight / 1000) .. "kg")
-    local amountText = (isSelling and "\nYour Amount: " .. OxInv:GetItemCount(product.name)) or ("")
+    local priceText = (product.price == 0 and "Free") or (CurrentShop.currencyIcon .. " " .. product.price)
+    local weightText = (invItem.weight) .. "g"
+    local amountText = (isSelling and "\nYour Amount: " .. OxInv:GetItemCount(product.name)) or product.amount
     local description = priceText .. weightText .. amountText
-    local imagePath = invItem?.client?.image
+    local imagePath = (invItem.client and invItem.client.image) or ("nui://ox_inventory/web/images/" .. invItem.name .. ".png")
 
-    local menuOption = {
-        title = invItem.label,
+    return {
+        productID = productID,
+        label = invItem.label,
+        name = product.name,
+        weight = weightText,
+        amount = amountText,
+        price = product.price,
+        priceText = priceText,
         description = description,
-        icon = imagePath,
+        image = imagePath,
         disabled = disabledProduct,
-        onSelect = function () TransactionMenu(productID, product, invItem) end,
     }
-
-    return menuOption
 end
 
 RegisterNetEvent("QBCore:Client:UpdateObject", function()
@@ -276,6 +288,20 @@ end)
 
 RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
     PlayerData = QBCore.Functions.GetPlayerData()
+end)
+
+RegisterNUICallback("CloseShop", function()
+    SetNuiFocus(false,false)
+end)
+
+RegisterNUICallback("ProcessTransaction", function(cart, cb)
+	SetNuiFocus(false,false)
+
+    Payload.method = cart.method
+    Payload.price = cart.price
+    Payload.cart = cart.cart
+
+	ProcessTransaction()
 end)
 
 CreateThread(function()

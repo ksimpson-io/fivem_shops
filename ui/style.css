@@ -1,0 +1,627 @@
+
+@font-face {
+    font-family: "Satoshi";
+    src: url(Satoshi-Bold.otf)
+}
+* {
+	padding: 0;
+	margin: 0;
+}
+
+.casNotify {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: auto;
+	height: auto;
+    left: 50%;
+    transform: translate(-50%);
+	position: absolute;
+
+	flex-shrink: 0;
+	border-radius: 19.911px;
+	background: transparent;
+	color: #BBB;
+	font-size: 28.493px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 500;
+}
+
+.back-container {
+	overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, 0.75); /* Adjust the last value (0.7) for transparency */
+	filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#B3000000", endColorstr="#B3000000", GradientType=1 );
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.main-container {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+	width: 75%;
+	height: 75%;
+}
+
+.left-container {
+	width: 100%;
+	margin-right: 3vh;
+}
+
+
+.header-div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 5vh;
+	margin-bottom: 2vh;
+}
+
+.shop-title {
+	font-family: Satoshi;
+	font-size: 2em; /* Adjust the size as needed */
+	font-weight: 700;
+	color: #fcf9f9; /* Set the color you want */
+	margin-bottom: 10px; /* Add some bottom margin to create space between the title and the search bar */
+}
+
+.search-bar {
+	display: flex;
+	position: relative;
+	align-items: center;
+	justify-content: flex-start;
+	width: 100%;
+	height: 100%;
+	border-radius: 5.391px;
+	padding-left: 2vh;
+	border: 1.078px solid #fcf9f9;
+	background: radial-gradient(70.12% 70.12% at 50.00% 50.00%, rgba(67, 67, 67, 0.00) 0%, rgba(11, 10, 14, 0.10) 100%);
+}
+
+
+
+.searchBar-input {
+    height: 100%;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    border: none;
+    outline: none;
+    color: #fcf9f9;
+    text-align: left;
+    font-size: 1.5vh;
+    font-family: Satoshi;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin-left: 15px; /* Adjust this value to push it more to the right */
+}
+
+#svg {
+	position: relative;
+	left: 1vh;
+}
+
+
+.action-bar {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	width: 70%;
+	height: 100%;
+}
+
+
+.action {
+	margin-left: 1.1vh;
+	width: 5.4vh;
+	height: 5.3vh;
+	border-radius: 2.695px;
+	outline: none;
+	border: none;
+	background: linear-gradient(141deg, rgba(217, 217, 217, 0.07) 0%, rgba(217, 217, 217, 0.00) 100%);
+}
+
+
+.item-body {
+	max-height: 85%;
+	overflow-y: scroll;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.itemBox {
+	background: rgba(54, 12, 88, 0.356);
+	padding: 2vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	margin: 1.4vh;
+	width: 160px;
+	height: 14.5vh;
+	border-radius: 6.324px;
+	position: relative;
+}
+
+.itemBox:hover {
+	background: rgba(54, 12, 88, 0.644);
+}
+
+/* Hide spinner controls */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+
+.item-amount, .item-weight {
+	background-color: rgba(54, 12, 88, 0.644);
+	font-size: 1.2vh;
+	font-family: Satoshi;
+	color: white;
+	padding: 5px;
+	border-radius: 6.324px;
+}
+
+.item-amount {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.item-weight {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.img-box {
+	width: 100%;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+}
+
+.img-box img {
+	width: 7vh;
+	height: 7vh;
+}
+
+.item-name {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #fcf9f9;
+	font-size: 1.2vh;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	text-transform: uppercase;
+	position: relative;
+	top: 1vh;
+}
+
+.button-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.addToCart {
+	color: #FFF;
+	font-size: 1.1vh;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	border: none;
+	outline: none;
+	border-radius: 1.48px;
+	background: rgba(24, 163, 19, 0.479);
+	width: 9vh;
+	height: 3.2vh;
+	flex-shrink: 0;
+	margin-right: 1vh;
+	transition: background-color 0.3s ease;
+}
+
+
+.addToCart:hover {
+	background: rgba(20, 129, 16, 0.479);
+}
+
+.priceOfItem {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: rgb(255, 255, 255);
+	font-size: 1.1vh;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	width: 5vh;
+	height: 3.2vh;
+	border-radius: 1.48px;
+	background: rgba(54, 12, 88, 0.479);
+}
+
+.active {
+	/* border: 1px solid rgb(10, 10, 10); */
+	background: linear-gradient(141deg, rgba(217, 217, 217, 0.07) 0%, rgba(217, 217, 217, 0.00) 100%);
+}
+
+::-webkit-scrollbar {
+    width: 0.4vw;
+	background: rgba(255, 255, 255, 0.13);
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(134, 5, 240, 0.479);
+    box-shadow: 0px 0px 4.2vh rgba(134, 5, 240, 0.479);
+    border-radius: 0.4vh;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(134, 5, 240, 0.479);
+    box-shadow: 0px 0px 4.2vh rgba(134, 5, 240, 0.479);
+}
+
+
+
+
+.right-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	width: 70%;
+	height: 100%;
+
+}
+
+
+.header-right {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	flex-direction: column;
+	width: 100%;
+	margin-bottom: 1vh;
+}
+
+.header-top {
+	color: #ffffff;
+	font-size: 33.926px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 900;
+	line-height: 162%;
+	letter-spacing: 1.866px;
+	margin: 0;
+}
+
+.footer-top {
+	color: #ffffff;
+	font-size: 20.214px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 162%;
+	margin: 0;
+}
+
+.right-body {
+	display: flex;
+	padding-top: 3.4vh;
+	padding-bottom: 3.4vh;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	border-radius: 6.324px;
+	background: radial-gradient(70.12% 70.12% at 50.00% 50.00%, rgba(99, 99, 99, 0.00) 0%, rgba(11, 10, 14, 0.10) 100%);
+}
+
+
+.shopcart {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	width: 90%;
+	height: 100%;
+	flex-wrap: wrap;
+	overflow-x: auto;
+}
+
+
+.shopItem {
+	display: flex;
+	width: 100%;
+	height: 11vh;
+	border-radius: 5.717px;
+	margin-bottom: 2.1vh;
+	background: rgba(54, 12, 88, 0.356);
+}
+
+
+.shopItem-left {
+	display: flex;
+	align-items: center;
+	justify-tracks: center;
+	width: 100%;
+	height: 100%;
+}
+
+.shopItem-img {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 10vh;
+	height: 100%;
+	margin-right: 2vh;
+	padding: 2vh;
+}
+
+.shopItem-img img {
+	width: 8.5vh;
+	height: 8vh;
+}
+
+.shopItem-right {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 45%;
+	height: 100%;
+	position: relative;
+}
+
+.shopItem-info {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.shopItem-label {
+	color: #FFF;
+	font-size: 14.969px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 162%;
+	letter-spacing: 0.823px;
+}
+
+.shopItem-price {
+	color: #35FF93;
+	font-size: 18.619px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 162%;
+	letter-spacing: 1.024px;
+}
+
+.countDown {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 21.337px;
+	height: 21.337px;
+	border: none;
+	outline: none;
+	flex-shrink: 0;
+	border-radius: 3.369px;
+	background: rgba(245, 79, 79, 0.20);
+	color: #F54F4F;
+	font-size: 12.617px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 162%;
+	letter-spacing: 0.694px;
+}
+
+.currentCount {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 51.214px;
+	height: 24.259px;
+	flex-shrink: 0;
+	border-radius: 3.594px;
+	background: linear-gradient(141deg, rgba(217, 217, 217, 0.07) 0%, rgba(217, 217, 217, 0.00) 100%);
+	color: #5bb894;
+	font-size: 12.617px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 162%;
+	letter-spacing: 0.694px;
+}
+
+.countUp {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 21.337px;
+	height: 21.337px;
+	border: none;
+	outline: none;
+	flex-shrink: 0;
+	border-radius: 3.369px;
+	background: rgba(79, 245, 116, 0.20);
+	color: #4FF574;
+	font-size: 12.617px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 700;
+	line-height: 162%;
+	letter-spacing: 0.694px;
+}
+
+.act-btn {
+	margin-right: 0.77vh;
+}
+
+.right-altBody {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 100%;
+	height: 50%;
+}
+
+.total-div {
+	height: 100%;
+	width: 100%;
+}
+
+.total-div {
+	display: flex;
+	width: 85%;
+	align-items: center;
+	justify-content: center;
+}
+
+.total-price {
+	width: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	height: 100%;
+	color: #5bb894;
+	font-size: 30.655px;
+	font-family: Satoshi;
+	font-style: normal;
+	font-weight: 900;
+	line-height: 162%;
+	letter-spacing: 1.686px;
+}
+
+
+.shopping-act-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 85%;
+}
+
+.top-btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.bottom-btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.left-btn-cont,
+.right-btn-cont,
+.mid-btn-cont  {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    justify-content: center;
+}
+
+.disabled-button {
+	background-color: rgba(248, 10, 50, 0.329);
+	pointer-events: none;
+}
+.disabled-button:hover {
+	background-color: rgba(248, 10, 50, 0.329);
+	pointer-events: none;
+}
+
+.pay {
+    width: 19vh;
+    height: 5.1vh;
+    color: #ffffff;
+    font-size: 13.054px;
+    font-family: Satoshi;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 162%;
+    letter-spacing: 0.718px;
+    outline: none;
+    border: none;
+    border-radius: 2.193px;
+    background: rgba(10, 34, 248, 0.329);
+    transition: background-color 0.3s ease;
+}
+
+.paywithcard {
+    background: rgba(7, 109, 3, 0.479);
+}
+
+.paywithcash {
+    background: rgba(248, 10, 50, 0.329);
+}
+
+.paywithcompany {
+    background: rgba(10, 34, 248, 0.329);
+}
+
+.paywithcash:hover {
+	background: rgba(248, 10, 10, 0.479);
+	cursor: pointer;
+}
+
+.paywithcompany:hover {
+	background: rgba(6, 49, 167, 0.479);
+}
+
+.paywithcard:hover {
+	background: rgba(11, 167, 6, 0.479);
+	cursor: pointer;
+}
+
+button:hover {
+	cursor: pointer;
+}
+
+.right-btn-cont .pay i,
+.left-btn-cont .pay i,
+.mid-btn-cont .pay i {
+    margin-right: 5px;
+}
+
+.right-btn-cont .pay .btn-text
+.left-btn-cont .pay .btn-text,
+.mid-btn-cont .pay .btn-text {
+    vertical-align: middle;
+}
