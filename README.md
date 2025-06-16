@@ -65,6 +65,28 @@ All shop definitions and product lists can be configured in:
 
 - Shops are **registered on the server** and synced to clients
 - Other scripts can trigger or register shops dynamically:
-  ```lua
+  ```
   TriggerEvent("frudy_shops:server:register", shopId, config)
   TriggerEvent("frudy_shops:server:openShop", source, shopId, mode) -- mode: "buy" or "sell"
+`
+
+---
+
+  ## 📸 Preview
+
+_(Add a few GIFs or images of pets being spawned, renamed, or doing tricks here if desired)_
+
+---
+
+## 🔐 License
+
+This script is for demo/showcase purposes only.
+Feel free to fork or use with credit. Do not resell or redistribute as your own.
+
+---
+
+## 📄 Credits & Disclaimer
+
+This system was originally created while working with **MC9 Gaming**. All logic, structure, and UI implementation in this repository were written by me (4rudy), and this version has been adapted for open demonstration and personal development use.
+
+No proprietary assets, private resources, or protected logic from **mc9-core** are distributed here. If you use this system, you will need to replace or recreate any internal MC9 dependencies.
