@@ -222,19 +222,18 @@ lib.callback.create("frudy_shops:server:ProcessTransaction", function(source, pa
         end
 
         for _, product in pairs(payload.cart) do
-            completed, errMsg = OxInv:AddItem(source, product.name, product.amount)
+            completed, errMsg = OxInv:AddItem(source, product.name, product.count)
         end
-
     else
         for _, product in pairs(payload.cart) do
-            if (OxInv:GetItemCount(source, product.name) <= 0) or (OxInv:GetItemCount(source, product.name) < product.amount) then
+            if (OxInv:GetItemCount(source, product.name) <= 0) or (OxInv:GetItemCount(source, product.name) < product.count) then
                 return false, "not_enough_items"
             end
         end
 
         finishSell(customer, payload.method, totalCost)
         for _, product in pairs(payload.cart) do
-            completed, errMsg = OxInv:RemoveItem(source, product.name, product.amount)
+            completed, errMsg = OxInv:RemoveItem(source, product.name, product.count)
         end
     end
 
@@ -264,7 +263,7 @@ lib.callback.create("frudy_shops:server:ProcessTransaction", function(source, pa
 
         TriggerEvent("qb-log:server:CreateLog", "shops", "Shop Transaction", color, logMsg)
 
-        errMsg = "success"
+        errMsg = isSelling and "sell_success" or "purchase_success"
     end
 
     return completed, errMsg

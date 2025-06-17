@@ -264,9 +264,11 @@ GetProduct = function(productID)
 
     local priceText = (product.price == 0 and "Free") or (CurrentShop.currencyIcon .. " " .. product.price)
     local weightText = (invItem.weight) .. "g"
-    local amountText = (isSelling and "\nYour Amount: " .. OxInv:GetItemCount(product.name)) or product.amount
+    local amountText = (isSelling and "\nYou Have: " .. OxInv:GetItemCount(product.name)) or product.amount
     local description = priceText .. weightText .. amountText
     local imagePath = (invItem.client and invItem.client.image) or ("nui://ox_inventory/web/images/" .. invItem.name .. ".png")
+    local maxAmount = (isSelling and OxInv:GetItemCount(product.name)) or product.amount
+    local buttonTxt = (isSelling and "Sell to Shop") or (product.amount == 0 and "Out of Stock") or "Add to Cart"
 
     return {
         productID = productID,
@@ -274,11 +276,13 @@ GetProduct = function(productID)
         name = product.name,
         weight = weightText,
         amount = amountText,
+        maxAmount = maxAmount,
         price = product.price,
         priceText = priceText,
         description = description,
         image = imagePath,
         disabled = disabledProduct,
+        buttonTxt = buttonTxt
     }
 end
 

@@ -1326,5 +1326,6 @@ Config.Locales = {
 	invalid_name = "The item doesn't exist",
 	invalid_inventory = "The inventory doesn't exist",
 	inventory_full = "No free slots",
-	success = "Purchase successful",
+	purchase_success = "Purchase successful",
+	sell_success = "Items sold",
 }

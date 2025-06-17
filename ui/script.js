@@ -21,8 +21,8 @@ const showMarket = function(shopItems, shopLabel) {
 			for (let index = 0; index < shopItems.length; index++) {
 				const element = shopItems[index];
 				let itemName = element.label;
-				let addButtonClass = element.amount === 0 ? 'disabled-button' : '';
-				let disabledAttribute = element.disabled || element.amount === 0 ? 'disabled' : '';
+				let addButtonClass = (element.disabled) ? ('disabled-button') : '';
+				let disabledAttribute = (element.disabled) ? ('disabled') : '';
 				let info = JSON.stringify(element.info);
 				allInfo[element.name] = info;
 
@@ -34,7 +34,8 @@ const showMarket = function(shopItems, shopLabel) {
 					data-price="${element.price}"
 					data-productid="${element.productID}"
 					data-info="${info}"
-					${disabledAttribute}>${element.amount === 0 ? 'Out of Stock' : 'Add to Cart'}
+					data-maxamount="${element.maxAmount}"
+					${disabledAttribute}>${element.buttonTxt}
 				</button>`;
 
 				values += `
@@ -72,7 +73,7 @@ const displayCart = function() {
 			</div>
 			<div class="shopItem-right">
 				<button class="countDown act-btn" data-name="${cartArray[i].name}" data-label="${cartArray[i].label}">-</button>
-				<input type="number" class="currentCount" data-name="${cartArray[i].name}" value="${cartArray[i].count}" min="1">
+				<input type="number" class="currentCount" data-name="${cartArray[i].name}" value="${cartArray[i].count}" min="1" max="${cartArray[i].maxAmount}">
 				<button class="countUp act-btn" data-name="${cartArray[i].name}" data-label="${cartArray[i].label}">+</button>
 			</div>
 	</div>`};
@@ -84,15 +85,15 @@ const displayCart = function() {
 let shoppingCart = (function() {
 	cart = [];
 
-	function Item(productID, name, label, price, count, img, info) {
+	function Item(productID, name, label, price, count, img, info, maxAmount) {
 		this.productID = productID;
 		this.name = name;
 		this.label = label;
 		this.price = price;
 		this.count = count;
-		this.image = img,
-		this.info = info
-		console.log(this.productID)
+		this.image = img;
+		this.info = info;
+		this.maxAmount = maxAmount
 	}
 
 	function saveCart() {
@@ -108,9 +109,10 @@ let shoppingCart = (function() {
 	}
 
 	let obj = {};
-	obj.addItemToCart = function(productID, itemName, label, price, count, img, info) {
+	obj.addItemToCart = function(productID, itemName, label, price, count, img, info, maxAmount) {
 		for (let item in cart) {
 			if (cart[item].name === itemName) {
+				if (cart[item].count >= maxAmount) return;
 				cart[item].count++;
 
 				saveCart();
@@ -118,27 +120,42 @@ let shoppingCart = (function() {
 			}
 		}
 
-		let item = new Item(productID, itemName, label, price, count, img, info);
+		let item = new Item(productID, itemName, label, price, count, img, info, maxAmount);
 		cart.push(item);
 		saveCart();
 	};
 
-	obj.setCountForItem = function(itemName, count) {
+	obj.setItemCount = function(itemName, count) {
 		for (let i in cart) {
 			if (cart[i].name === itemName) {
+				if (count > cart[i].maxAmount) return
+
 				cart[i].count = count;
 				break;
 			}
 		}
 	};
 
-	obj.removeItemFromCart = function(itemName) {
+	obj.decreaseItemCount = function(itemName) {
 		for (let item in cart) {
 			if (cart[item].name === itemName) {
 				cart[item].count--;
+
 				if (cart[item].count === 0) {
 					cart.splice(item, 1);
 				}
+				break;
+			}
+		}
+		saveCart();
+	};
+
+	obj.increaseItemCount = function(itemName) {
+		for (let item in cart) {
+			if (cart[item].name === itemName) {
+				if (cart[item].count >= cart[item].maxAmount) return;
+
+				cart[item].count++;
 				break;
 			}
 		}
@@ -218,7 +235,7 @@ let closeShop = function() {
 			shoppingCart.clearCart();
 			displayCart();
 		});
-		$.post("https://mc9-basicshops/CloseShop");
+		$.post("https://frudy_shops/CloseShop");
 	});
 };
 
@@ -241,9 +258,10 @@ $(document).on("click", ".addToCart", function() {
 	let img = $(this).data("img");
 	let label = $(this).data("label");
 	let productID = $(this).data("productid");
+	let maxAmount = Number($(this).data("maxamount"));
 	info = allInfo[itemName];
 
-	shoppingCart.addItemToCart(productID, itemName, label, price, 1, img, info);
+	shoppingCart.addItemToCart(productID, itemName, label, price, 1, img, info, maxAmount);
 	displayCart();
 });
 
@@ -258,7 +276,7 @@ $(document).on("click", ".pay", function() {
 		paymentMethod = "company";
 	}
 
-	$.post("https://mc9-basicshops/ProcessTransaction", JSON.stringify({
+	$.post("https://frudy_shops/ProcessTransaction", JSON.stringify({
 		cart: cartData,
 		price: shoppingCart.totalCart(),
 		method: paymentMethod,
@@ -274,24 +292,23 @@ $(document).on("click", ".pay", function() {
 
 $(document).on("click", ".countDown", function(event) {
 	let name = $(this).data('name')
-	shoppingCart.removeItemFromCart(name);
+
+	shoppingCart.decreaseItemCount(name);
 	displayCart();
 });
 
 $(document).on("click", ".countUp", function(event) {
 	let name = $(this).data('name');
-	let originalAmount = parseInt($(".item-amount[data-name='" + name + "']").text());
-	let currentCount = shoppingCart.getCountByName(name);
-	if (currentCount < originalAmount) {
-		shoppingCart.setCountForItem(name, currentCount + 1);
-		displayCart();
-	}
+
+	shoppingCart.increaseItemCount(name);
+	displayCart();
 });
 
 $(document).on("change", ".currentCount", function(event) {
 	let name = $(this).data('name');
 	let count = Number($(this).val());
-	shoppingCart.setCountForItem(name, count);
+
+	shoppingCart.setItemCount(name, count);
 	displayCart();
 });
 
